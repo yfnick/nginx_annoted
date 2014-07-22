@@ -1,4 +1,5 @@
 nginx_annoted
 =============
-annoted nginx source code in Chinese.
-nginx version 1.7.0
+annoted Nginx source code in Chinese.
+
+Nginx version 1.7.0
