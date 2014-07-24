@@ -32,8 +32,8 @@ typedef void (*ngx_pool_cleanup_pt)(void *data);
 typedef struct ngx_pool_cleanup_s  ngx_pool_cleanup_t;
 
 struct ngx_pool_cleanup_s {
-    ngx_pool_cleanup_pt   handler;
-    void                 *data;
+    ngx_pool_cleanup_pt   handler; /* 释放data空间的函数指针*/
+    void                 *data;    /* 缓存区*/
     ngx_pool_cleanup_t   *next;
 };
 
@@ -54,13 +54,16 @@ typedef struct {
 } ngx_pool_data_t;
 
 
+/*
+* 内存池block
+*/
 struct ngx_pool_s {
-    ngx_pool_data_t       d;
-    size_t                max;
-    ngx_pool_t           *current;
-    ngx_chain_t          *chain;
-    ngx_pool_large_t     *large;
-    ngx_pool_cleanup_t   *cleanup;
+    ngx_pool_data_t       d;        /* 数据区*/
+    size_t                max;      /* 可用空间大小 */
+    ngx_pool_t           *current;  /* 当前可用内存block指针 */
+    ngx_chain_t          *chain;    /* chain buffer */
+    ngx_pool_large_t     *large;    /* large buffer */
+    ngx_pool_cleanup_t   *cleanup;  /* cleanup area */
     ngx_log_t            *log;
 };
 

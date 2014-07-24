@@ -17,6 +17,9 @@ static ngx_int_t ngx_decode_base64_internal(ngx_str_t *dst, ngx_str_t *src,
     const u_char *basis);
 
 
+/*
+* 功能: 大写字母转换为小写字母
+*/
 void
 ngx_strlow(u_char *dst, u_char *src, size_t n)
 {
@@ -29,6 +32,9 @@ ngx_strlow(u_char *dst, u_char *src, size_t n)
 }
 
 
+/*
+* 功能: 拷贝字符串
+*/
 u_char *
 ngx_cpystrn(u_char *dst, u_char *src, size_t n)
 {
@@ -53,6 +59,9 @@ ngx_cpystrn(u_char *dst, u_char *src, size_t n)
 }
 
 
+/*
+* 功能: 字符串复制拷贝
+*/
 u_char *
 ngx_pstrdup(ngx_pool_t *pool, ngx_str_t *src)
 {

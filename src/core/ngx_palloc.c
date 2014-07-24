@@ -13,24 +13,32 @@ static void *ngx_palloc_block(ngx_pool_t *pool, size_t size);
 static void *ngx_palloc_large(ngx_pool_t *pool, size_t size);
 
 
+/*
+* 功能: 创建大小为size的内存池
+*/
 ngx_pool_t *
 ngx_create_pool(size_t size, ngx_log_t *log)
 {
     ngx_pool_t  *p;
 
+	// 返回16字节对齐size大小的内存空间
     p = ngx_memalign(NGX_POOL_ALIGNMENT, size, log);
     if (p == NULL) {
         return NULL;
     }
 
+	// 可用空间起始地址
     p->d.last = (u_char *) p + sizeof(ngx_pool_t);
+	// 可用空间结束地址
     p->d.end = (u_char *) p + size;
     p->d.next = NULL;
     p->d.failed = 0;
 
     size = size - sizeof(ngx_pool_t);
+	// 最大可用空间大小
     p->max = (size < NGX_MAX_ALLOC_FROM_POOL) ? size : NGX_MAX_ALLOC_FROM_POOL;
 
+	// 当前可用内存池
     p->current = p;
     p->chain = NULL;
     p->large = NULL;
@@ -41,6 +49,9 @@ ngx_create_pool(size_t size, ngx_log_t *log)
 }
 
 
+/*
+* 功能: 释放内存池空间
+*/
 void
 ngx_destroy_pool(ngx_pool_t *pool)
 {
@@ -56,6 +67,7 @@ ngx_destroy_pool(ngx_pool_t *pool)
         }
     }
 
+	// 释放大段内存
     for (l = pool->large; l; l = l->next) {
 
         ngx_log_debug1(NGX_LOG_DEBUG_ALLOC, pool->log, 0, "free: %p", l->alloc);
@@ -93,6 +105,9 @@ ngx_destroy_pool(ngx_pool_t *pool)
 }
 
 
+/*
+* 功能: 重置内存池
+*/
 void
 ngx_reset_pool(ngx_pool_t *pool)
 {
@@ -116,16 +131,21 @@ ngx_reset_pool(ngx_pool_t *pool)
 }
 
 
+/*
+* 功能: 从内存池申请size大小空间
+*/
 void *
 ngx_palloc(ngx_pool_t *pool, size_t size)
 {
     u_char      *m;
     ngx_pool_t  *p;
 
+	// 当申请大小不超过内存block的最大可用空间
     if (size <= pool->max) {
 
         p = pool->current;
 
+		// 寻找可用空间足够的内存block
         do {
             m = ngx_align_ptr(p->d.last, NGX_ALIGNMENT);
 
@@ -139,13 +159,19 @@ ngx_palloc(ngx_pool_t *pool, size_t size)
 
         } while (p);
 
+		// 当所有内存block的可用空间均不满足时，
+		// 申请新的内存block
         return ngx_palloc_block(pool, size);
     }
 
+	// 申请大段内存
     return ngx_palloc_large(pool, size);
 }
 
 
+/*
+* 功能: 从内存池申请size大小空间
+*/
 void *
 ngx_pnalloc(ngx_pool_t *pool, size_t size)
 {
@@ -176,6 +202,9 @@ ngx_pnalloc(ngx_pool_t *pool, size_t size)
 }
 
 
+/*
+* 功能: 申请新的内存block
+*/
 static void *
 ngx_palloc_block(ngx_pool_t *pool, size_t size)
 {
@@ -216,6 +245,9 @@ ngx_palloc_block(ngx_pool_t *pool, size_t size)
 }
 
 
+/*
+* 功能: 从内存池申请大段内存空间
+*/
 static void *
 ngx_palloc_large(ngx_pool_t *pool, size_t size)
 {
@@ -255,6 +287,10 @@ ngx_palloc_large(ngx_pool_t *pool, size_t size)
 }
 
 
+/*
+* 功能: 申请alignment对齐size大小空间，
+*              创建ngx_pool_large_t结构，保存申请空间地址
+*/
 void *
 ngx_pmemalign(ngx_pool_t *pool, size_t size, size_t alignment)
 {
@@ -280,6 +316,9 @@ ngx_pmemalign(ngx_pool_t *pool, size_t size, size_t alignment)
 }
 
 
+/*
+* 功能: 释放大段内存空间
+*/
 ngx_int_t
 ngx_pfree(ngx_pool_t *pool, void *p)
 {
@@ -300,6 +339,9 @@ ngx_pfree(ngx_pool_t *pool, void *p)
 }
 
 
+/*
+* 功能: 申请size大小空间并初始化为0
+*/
 void *
 ngx_pcalloc(ngx_pool_t *pool, size_t size)
 {
@@ -314,6 +356,9 @@ ngx_pcalloc(ngx_pool_t *pool, size_t size)
 }
 
 
+/*
+* 功能: 内存池cleanup添加节点，节点大小为size
+*/
 ngx_pool_cleanup_t *
 ngx_pool_cleanup_add(ngx_pool_t *p, size_t size)
 {
@@ -345,6 +390,9 @@ ngx_pool_cleanup_add(ngx_pool_t *p, size_t size)
 }
 
 
+/*
+* 功能: 内存池清除文件
+*/
 void
 ngx_pool_run_cleanup_file(ngx_pool_t *p, ngx_fd_t fd)
 {
@@ -366,6 +414,9 @@ ngx_pool_run_cleanup_file(ngx_pool_t *p, ngx_fd_t fd)
 }
 
 
+/*
+* 功能: 关闭文件
+*/
 void
 ngx_pool_cleanup_file(void *data)
 {
@@ -381,6 +432,9 @@ ngx_pool_cleanup_file(void *data)
 }
 
 
+/*
+* 功能: 删除文件
+*/
 void
 ngx_pool_delete_file(void *data)
 {
