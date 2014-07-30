@@ -78,18 +78,18 @@ typedef void (*ngx_output_chain_aio_pt)(ngx_output_chain_ctx_t *ctx,
 #endif
 
 struct ngx_output_chain_ctx_s {
-    ngx_buf_t                   *buf;
-    ngx_chain_t                 *in;
-    ngx_chain_t                 *free;
-    ngx_chain_t                 *busy;
+    ngx_buf_t                   *buf;  /* 临时缓存 */
+    ngx_chain_t                 *in;   /* 待发送chain */
+    ngx_chain_t                 *free; /* 已发送chain */
+    ngx_chain_t                 *busy; /* 未发送chain */
 
-    unsigned                     sendfile:1;
-    unsigned                     directio:1;
+    unsigned                     sendfile:1; /* sendfile标记 */
+    unsigned                     directio:1; /* directio标记 */
 #if (NGX_HAVE_ALIGNED_DIRECTIO)
     unsigned                     unaligned:1;
 #endif
-    unsigned                     need_in_memory:1;
-    unsigned                     need_in_temp:1;
+    unsigned                     need_in_memory:1; /* 是否需要在内存保存 */
+    unsigned                     need_in_temp:1;   /* 是否存在的buf复制一份 */
 #if (NGX_HAVE_FILE_AIO)
     unsigned                     aio:1;
 
@@ -99,12 +99,12 @@ struct ngx_output_chain_ctx_s {
     off_t                        alignment;
 
     ngx_pool_t                  *pool;
-    ngx_int_t                    allocated;
-    ngx_bufs_t                   bufs;
-    ngx_buf_tag_t                tag;
+    ngx_int_t                    allocated;     /* 已申请的大小 */
+    ngx_bufs_t                   bufs;          /* buf大小 */
+    ngx_buf_tag_t                tag;           /* 现在处于哪个模块 */
 
     ngx_output_chain_filter_pt   output_filter;
-    void                        *filter_ctx;
+    void                        *filter_ctx;   /* 当前上下文 */
 };
 
 
