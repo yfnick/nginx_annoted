@@ -107,6 +107,7 @@ ngx_time_update(void)
 
     tp = &cached_time[slot];
 
+	// save time in cached_time slot
     tp->sec = sec;
     tp->msec = msec;
 
@@ -279,6 +280,9 @@ ngx_http_cookie_time(u_char *buf, time_t t)
 }
 
 
+// why not using localtime ?
+// time_t : seconds since January 1, 1970
+// ngx_tm_t -> struct tm : record date info since then
 void
 ngx_gmtime(time_t t, ngx_tm_t *tp)
 {
@@ -292,6 +296,7 @@ ngx_gmtime(time_t t, ngx_tm_t *tp)
     days = n / 86400;
 
     /* January 1, 1970 was Thursday */
+	/* wday(0: Sunday, 1: Monday, 2: Tuesday, 3: Wednesday, 4: Thursday, 5: Friday, 6: Saturday */
 
     wday = (4 + days) % 7;
 
