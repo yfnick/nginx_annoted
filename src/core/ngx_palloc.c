@@ -77,6 +77,8 @@ ngx_destroy_pool(ngx_pool_t *pool)
         }
     }
 
+	/* what to do with chain buffer??? */
+
 #if (NGX_DEBUG)
 
     /*
@@ -114,6 +116,7 @@ ngx_reset_pool(ngx_pool_t *pool)
     ngx_pool_t        *p;
     ngx_pool_large_t  *l;
 
+	/* why only do with large buffer??? */
     for (l = pool->large; l; l = l->next) {
         if (l->alloc) {
             ngx_free(l->alloc);
